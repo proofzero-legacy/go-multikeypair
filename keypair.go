@@ -21,33 +21,38 @@ import (
 // Errors
 // -----------------------------------------------------------------------------
 
+// Minimum and maximum key lengths in bytes.
 const (
 	MIN_KEY_LENGTH = 2
 	MAX_KEY_LENGTH = 256
 )
 
+// Keypair-specific errors this module exports.
 var (
 	ErrUnknownCode         = errors.New("unknown multikeypair code")
 	ErrTooShort            = errors.New("multikeypair too short. must be >= 2 bytes")
 	ErrTooLong             = errors.New("multikeypair too long. must be < 129 bytes")
 	ErrInvalidMultikeypair = errors.New("input isn't valid multikeypair")
+	ErrVarintBufferShort   = errors.New("uvarint: buffer too small")
+	ErrVarintTooLong       = errors.New("uvarint: varint too big (max 64bit)")
 )
 
 // Ciphers
 // -----------------------------------------------------------------------------
 
+// Support ciphers. Accepting PRs for more!
 const (
 	IDENTITY = uint64(0x00)
 	ED_25519 = uint64(0x11)
 )
 
-// A mapping from cipher name to code.
+// Names is a mapping from cipher name to code.
 var Names = map[string]uint64{
 	"identity": IDENTITY,
 	"ed25519":  ED_25519,
 }
 
-// A mapping from cipher code to name.
+// Codes is a mapping from cipher code to name.
 var Codes = map[uint64]string{
 	IDENTITY: "identity",
 	ED_25519: "ed25519",
@@ -55,9 +60,8 @@ var Codes = map[uint64]string{
 
 // Keypair
 // -----------------------------------------------------------------------------
-// A keypair is an public/private keypair unpacked into a struct for
-// easy access.
 
+// Keypair is a public/private keypair unpacked into a struct for easy access.
 type Keypair struct {
 	// Cipher identification code.
 	Code uint64
@@ -75,12 +79,12 @@ type Keypair struct {
 
 // Multikey
 // -----------------------------------------------------------------------------
-// A Multikey is a byte slice with the following form:
+
+// Multikeypair is a byte slice with the following form:
 // [length] (24-bit length prefix)
 //   [code length]<code> (16-bit length prefix, uvarint code)
 //   [private key length]<private key> (16-bit length prefix)
 //   [public key length]<public key> (16-bit length prefix)
-
 type Multikeypair []byte
 
 // Implementation
@@ -100,8 +104,8 @@ func Encode(private []byte, public []byte, code uint64) (Multikeypair, error) {
 	return Multikeypair(b), nil
 }
 
-// Encode a keypair into a Multikeypair, specifying the keypair type
-// using a string name instead of an integer code.
+// EncodeName encodes a keypair into a Multikeypair, specifying the keypair
+// type using a string name instead of an integer code.
 func EncodeName(private []byte, public []byte, name string) (Multikeypair, error) {
 	code := Names[name]
 	return Encode(private, public, code)
@@ -117,7 +121,7 @@ func (k Keypair) Encode() (Multikeypair, error) {
 
 // Check that the supplied code is one we recognize.
 func validCode(code uint64) error {
-	for k, _ := range Codes {
+	for k := range Codes {
 		if k == code {
 			return nil
 		}
@@ -158,7 +162,7 @@ func encodeKeypair(private []byte, public []byte, code uint64) []byte {
 // DECODE
 //
 
-// Unpack a multikeypair into a Keypair struct.
+// Decode unpacks a multikeypair into a Keypair struct.
 func Decode(m Multikeypair) (Keypair, error) {
 	keypair, err := decodeKeypair([]byte(m))
 	if err != nil {
@@ -168,7 +172,7 @@ func Decode(m Multikeypair) (Keypair, error) {
 	return *keypair, nil
 }
 
-// Unpack a multikeypair into a Keypair struct.
+// Decode unpacks a multikeypair into a Keypair struct.
 func (m Multikeypair) Decode() (Keypair, error) {
 	return Decode(m)
 }
@@ -236,12 +240,12 @@ func castKeypair(buf []byte) (Multikeypair, error) {
 // Base-58
 //
 
-// Generate a base58-encoded version of a Multikeypair.
+// B58String generates a base58-encoded version of a Multikeypair.
 func (m Multikeypair) B58String() string {
 	return b58.Encode([]byte(m))
 }
 
-// Parse a base58-encoded hex string into a Multikeypair.
+// MultikeypairFromB58 parses a base58-encoded hex string into a Multikeypair.
 func MultikeypairFromB58(s string) (Multikeypair, error) {
 	b, err := b58.Decode(s)
 	if err != nil {
@@ -257,6 +261,7 @@ func MultikeypairFromB58(s string) (Multikeypair, error) {
 	return castKeypair(b)
 }
 
+// KeypairFromB58 parses a base58-encoded hex string into a Keypair.
 func KeypairFromB58(s string) (Keypair, error) {
 	mk, err := MultikeypairFromB58(s)
 	if err != nil {
@@ -273,23 +278,10 @@ func KeypairFromB58(s string) (Keypair, error) {
 	return kp, nil
 }
 
-//import (
-//	"errors"
-//
-//)
-//
-// Errors
+// Utility functions
 // -----------------------------------------------------------------------------
 
-var (
-	ErrVarintBufferShort = errors.New("uvarint: buffer too small")
-	ErrVarintTooLong     = errors.New("uvarint: varint too big (max 64bit)")
-)
-
-// Utilities
-// -----------------------------------------------------------------------------
-
-// Pack cipher code as varint.
+// PackCode packs a cipher code as varint.
 func PackCode(code uint64) []byte {
 	// Encode a uint64 into a buffer and return number of bytes
 	// written. Panics if the buffer is too small.
@@ -299,6 +291,7 @@ func PackCode(code uint64) []byte {
 	return buf
 }
 
+// UnpackCode unpacks a varint cipher code.
 func UnpackCode(buf []byte) (uint64, error) {
 	// Returns number of bytes read if successful. On error the
 	// value is 0 and the of bytes is <= 0, meaning:
