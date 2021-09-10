@@ -1,0 +1,56 @@
+---
+#####
+# https://github.com/probot/settings/blob/master/README.md
+_extends: "cloud"
+repository:
+  name: "go-multikeypair"
+  topics: ["kubelt", "ipld", "ipfs", "data", "data science", "data engineering", "linked data", "crypto", "encryption", "multiformats"]
+  description: "A multiformat-inspired go module for working with multiple kinds of keypairs."
+  allow_merge_commits: false
+  allow_rebase_merge: false
+  allow_squash_merge: true
+  archived: false
+  auto_init: false
+  delete_branch_on_merge: true
+  has_downloads: false
+  has_issues: true
+  has_wiki: false
+  is_template: false
+  visibility: "public"
+  vulnerability_alerts: true
+
+branches:
+  - name: main
+    protection:
+      enforce_admins: true
+      required_signed_commits: false
+      required_pull_request_reviews:
+        required_approving_reviews_count: 1
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: false
+      required_status_checks:
+        strict: true
+        contexts: []
+      restrictions:
+        apps: []
+        users: []
+        teams: []
+
+labels:
+  - name: bug
+    color: CC0000
+    description: An issue with the system 🐛.
+
+  - name: feature
+    color: '#336699'
+    description: New functionality.
+
+  - name: chore
+  
+  - name: question
+
+  - name: first-timers-only
+
+milestones:
+  - title: alpha
+    state: open

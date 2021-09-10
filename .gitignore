@@ -1,0 +1,5 @@
+# Ignore dotfiles
+.*
+!.gitignore
+!.gitattributes
+!.github
