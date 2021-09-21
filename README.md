@@ -4,7 +4,7 @@
 [![Go](https://img.shields.io/github/go-mod/go-version/proofzero/go-multikeypair)](https://golang.org/dl/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/proofzero/go-multikeypair)](https://goreportcard.com/report/github.com/proofzero/go-multikeypair)
 ![build](https://github.com/proofzero/go-multikeypair/actions/workflows/build.yaml/badge.svg)
-![matrix](https://img.shields.io/matrix/lobby:matrix.kubelt.com?label=matrix&server_fqdn=matrix.kubelt.com)
+[![matrix](https://img.shields.io/matrix/lobby:matrix.kubelt.com?label=matrix&server_fqdn=matrix.kubelt.com)](https://matrix.to/#/#lobby:matrix.kubelt.com)
 [![Slack](https://img.shields.io/badge/slack-@kubelt-FD4E83.svg)](https://kubelt.slack.com)
 
 A multiformats-inspired module for encoding cryptographic keypairs.
