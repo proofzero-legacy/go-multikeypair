@@ -9,10 +9,11 @@
 package multikeypair
 
 import (
+	"encoding/binary"
 	"errors"
+
 	//"fmt"
 
-	"encoding/binary"
 	b58 "github.com/mr-tron/base58/base58"
 	varint "github.com/multiformats/go-varint"
 	cryptobyte "golang.org/x/crypto/cryptobyte"
@@ -44,18 +45,27 @@ var (
 const (
 	IDENTITY = uint64(0x00)
 	ED_25519 = uint64(0x11)
+	BIP_32   = uint64(0x12)
+	DSA      = uint64(0x13)
+	RSA      = uint64(0x14)
 )
 
 // Names is a mapping from cipher name to code.
 var Names = map[string]uint64{
 	"identity": IDENTITY,
 	"ed25519":  ED_25519,
+	"bip32":    BIP_32,
+	"dsa":      DSA,
+	"res":      RSA,
 }
 
 // Codes is a mapping from cipher code to name.
 var Codes = map[uint64]string{
 	IDENTITY: "identity",
 	ED_25519: "ed25519",
+	BIP_32:   "bip32",
+	DSA:      "dsa",
+	RSA:      "rsa",
 }
 
 // Keypair
